@@ -9,7 +9,9 @@
 
 找个装有Docker toolbox的环境，执行下下面两句就能看到效果，如果docker镜像拖不下来的话记得准备梯子。
 > docker-compose build
+
 > docker-compose up -d
+
 然后浏览器访问docker环境的80端口就行。
 
 
