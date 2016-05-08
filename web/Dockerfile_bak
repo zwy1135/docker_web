@@ -1,0 +1,19 @@
+FROM my/busybox:glibc
+
+RUN mkdir -p /web
+
+WORKDIR /web
+
+VOLUME ["/transfer"]
+
+ADD ./entrypoint.sh /web
+
+RUN chmod u+x ./entrypoint.sh
+
+ADD ./static /web/static
+
+ADD ./templates /web/templates
+
+EXPOSE 8000
+
+CMD ["/bin/sh","./entrypoint.sh"]

@@ -1,0 +1,20 @@
+﻿mongodb:
+    image: mongo:latest
+    expose: 
+        - "27017"
+
+buildexe: 
+    build: ./source 
+    volumes:
+        - "/tmp:/transfer"
+    
+web:
+    build: ./web 
+    volumes_from: 
+        - buildexe 
+    expose: 
+        - "8000"
+    ports: 
+        - "80:8000" 
+    links:
+        - mongodb
