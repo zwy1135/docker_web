@@ -22,15 +22,10 @@ logging.basicConfig(level=logging.DEBUG,
                 )
                 
                 
-class UserRelationHandler(web.RequestHandler):
-    def get(self):
-        user_id = self.get_argument("user_id",default=None)
-        self.render("user_relationship.html",user_id=user_id)
+
         
 
-handlers = [
-    (r"/",UserRelationHandler),
-]
+handlers = []
 
 handlers += HandlerList.handlers
 
@@ -50,3 +45,5 @@ if __name__ == "__main__":
     server = httpserver.HTTPServer(app)
     server.listen(options.port)
     ioloop.IOLoop.instance().start()
+    
+    

@@ -1,42 +1,21 @@
-<html>
-	<head>
-		<title>用户关系</title>
-         
-        <!-- 新 Bootstrap 核心 CSS 文件 -->
-        <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+{% extends "base.html" %} 
+{% block body %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <form class="navbar-form navbar-left" role="search" method="get">
+                <div class="form-group">
+                    <input name="user_id" type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-success">他关注了谁？</button>
+            </form>
+        </div>
+    </nav>
 
-        <!-- 可选的Bootstrap主题文件（一般不用引入） -->
-        <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
-        <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
-
-        <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-        <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
-	</head>
-    
-    <body>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <form class="navbar-form navbar-left" role="search" method="get">
-                    <div class="form-group">
-                        <input name="user_id" type="text" class="form-control" placeholder="Search">
-                    </div>
-                    <button type="submit" class="btn btn-success">Submit</button>
-                </form>
-            </div>
-        </nav>
-        
-        <!--div class="jumbotron" -->
-            <!-- <div class="container">-->
-                <script src="{{static_url("draw.js")}}"></script> 
-                {% if user_id %}
-                <script>
-                    drawing_function({{user_id}})
-                </script>
-                {% end %}
-            <!--</div> -->
-        <!--/div -->
-    </body>
-</html>
+    <script src="{{static_url("draw.js")}}"></script>
+    {% if user_id %}
+    <script>
+        drawing_relationship("/relationship_data?user_id=" + {{user_id}});
+    </script>
+    {% end %} 
+{% end %}
