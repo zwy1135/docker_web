@@ -1,12 +1,16 @@
 ﻿mongodb:
     image: mongo:latest
+    volumes: 
+        - "/var/lib/docker/data/mongo:/data/db"
     expose: 
         - "27017"
+    ports:
+        - "27017:27017"
 
 buildexe: 
     build: ./source 
     volumes:
-        - "/tmp:/transfer"
+        - "/transfer:/transfer"
     
 web:
     build: ./web 
