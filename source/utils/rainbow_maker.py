@@ -20,6 +20,7 @@ db = conn.bilidb
 
 rainbow_table = db.rainbow_table
 rainbow_table.create_index(u"key", unique=True)
+rainbow_table.create_index(u"crc32_int")
 try:
     if False:
         res = rainbow_table.find({u"crc32_int":None})
