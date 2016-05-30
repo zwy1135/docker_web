@@ -2,7 +2,9 @@
 
 {% block body %}
     <script src="{{static_url("draw.js")}}"></script>
-    <script>
-        drawing_piechart("/sex_distribution_data");
-    </script>
+    <div id="piechartpanel" class="panel panel-default panel-center">
+        <script>
+            drawing_piechart("/sex_distribution_data","#piechartpanel");
+        </script>
+    </div>
 {% end %}

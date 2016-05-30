@@ -1,12 +1,12 @@
 //from http://www.ourd3js.com/wordpress/?p=555
 
-var drawing_relationship = function (data_url) {
+var drawing_relationship = function (data_url,item) {
     var width = 1024;
     var height = 768;
     var img_w = 77;
     var img_h = 90;
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(item).append("svg")
         .attr("width", width)
         .attr("height", height);
     d3.json(data_url, function (error, root) {
@@ -114,11 +114,11 @@ var drawing_relationship = function (data_url) {
     });
 }
 
-var drawing_piechart = function (data_url) {
+var drawing_piechart = function (data_url,item) {
     var width = 600;
     var height = 600;
 
-    var svg = d3.select("body")			//选择<body>
+    var svg = d3.select(item)			//选择<body>
         .append("svg")			//在<body>中添加<svg>
         .attr("width", width)	//设定<svg>的宽度属性
         .attr("height", height);//设定<svg>的高度属性
@@ -159,7 +159,7 @@ var drawing_piechart = function (data_url) {
             .data(piedata)		//绑定转换后的数据piedata
             .enter()
             .append("g")
-            .attr("transform", "translate(" + (outerRadius) + "," + (outerRadius) + ")");
+            .attr("transform", "translate(" + (outerRadius+300) + "," + (outerRadius+300) + ")");
 
         //绘制弧
         arcs.append("path")

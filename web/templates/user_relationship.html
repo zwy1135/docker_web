@@ -1,21 +1,14 @@
 {% extends "base.html" %} 
 {% block body %}
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <form class="navbar-form navbar-left" role="search" method="get">
-                <div class="form-group">
-                    <input name="user_id" type="text" class="form-control" placeholder="Search">
-                </div>
-                <button type="submit" class="btn btn-success">他关注了谁？</button>
-            </form>
-        </div>
-    </nav>
+    
 
 
     <script src="{{static_url("draw.js")}}"></script>
-    {% if user_id %}
-    <script>
-        drawing_relationship("/relationship_data?user_id=" + {{user_id}});
-    </script>
-    {% end %} 
+    <div id="relationpanel" class="panel panel-default">
+        {% if user_id %}
+        <script>
+            drawing_relationship("/relationship_data?user_id=" + {{user_id}},"#relationpanel");
+        </script>
+        {% end %} 
+    </div>
 {% end %}
