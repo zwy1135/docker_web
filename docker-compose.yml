@@ -1,7 +1,8 @@
 ﻿mongodb:
     image: mongo:latest
     volumes: 
-        - "/var/lib/docker/data/mongo:/data/db"
+        - "/data/mongo/bili/db:/data/db"
+        - "/data/mongo/bili/configdb:/data/configdb"
     expose: 
         - "27017"
     ports:
@@ -10,7 +11,7 @@
 buildexe: 
     build: ./source 
     volumes:
-        - "/transfer:/transfer"
+        - "/tmp/transfer:/transfer"
     
 web:
     build: ./web 

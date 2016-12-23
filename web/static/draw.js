@@ -3,12 +3,13 @@
 var drawing_relationship = function (data_url,item) {
     var width = 1024;
     var height = 768;
-    var img_w = 77;
-    var img_h = 90;
-
+    var img_w = 40;
+    var img_h = 40;
+    
     var svg = d3.select(item).append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr("class", "center-block");
     d3.json(data_url, function (error, root) {
 
         if (error) {
@@ -50,6 +51,7 @@ var drawing_relationship = function (data_url,item) {
             .attr("xlink:href", function (d) {
                 return d.image;
             })
+            .attr("class", "img-circle")
             .on("mouseover", function (d, i) {
                 //显示连接线上的文字
                 edges_text.style("fill-opacity", function (edge) {
@@ -121,7 +123,8 @@ var drawing_piechart = function (data_url,item) {
     var svg = d3.select(item)			//选择<body>
         .append("svg")			//在<body>中添加<svg>
         .attr("width", width)	//设定<svg>的宽度属性
-        .attr("height", height);//设定<svg>的高度属性
+        .attr("height", height) //设定<svg>的高度属性
+        .attr("class", "center-block");
 
     d3.json(data_url, function (error, root) {
         if (error) {
@@ -159,7 +162,7 @@ var drawing_piechart = function (data_url,item) {
             .data(piedata)		//绑定转换后的数据piedata
             .enter()
             .append("g")
-            .attr("transform", "translate(" + (outerRadius+300) + "," + (outerRadius+300) + ")");
+            .attr("transform", "translate(" + (width/2) + "," + (outerRadius) + ")");
 
         //绘制弧
         arcs.append("path")
