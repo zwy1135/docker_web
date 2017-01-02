@@ -13,13 +13,30 @@ buildexe:
     volumes:
         - "/tmp/transfer:/transfer"
     
-web:
+web1:
     build: ./web 
     volumes_from: 
         - buildexe 
     expose: 
         - "8000"
-    ports: 
-        - "80:8000" 
     links:
         - mongodb
+
+web2:
+    build: ./web 
+    volumes_from: 
+        - buildexe 
+    expose: 
+        - "8000"
+    links:
+        - mongodb
+
+loadbalancer:
+    build: ./LB
+    expose:
+        - "80"
+    ports:
+        - "80:80"
+    links:
+        - web1
+        - web2
