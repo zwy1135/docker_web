@@ -7,7 +7,10 @@ Created on Mon Apr  4 18:17:33 2016
 import json
 import logging
 
-import tornado.web as web
+from tornado.concurrent import return_future 
+from tornado import web
+from tornado import gen
+
 import requests as rq
 import pymongo
 import zlib
@@ -48,28 +51,35 @@ def get_data(user_id = 423895):
     except:
         return None
         
-        
+@return_future        
+def get_relationship_data(user_id,callback):
+    user_id = int(user_id)
+    user_list = []
+    user_res = get_data(user_id)
+    assert(user_res is not None)
+    user_list.append(user_res)
+    if user_res["attentions"]:
+        attentions = [get_data(int(x)) for x in user_res["attentions"]]
+        user_list.extend(attentions)
 
+    callback(user_list)
 
 
 class RelationshipJsonHandler(web.RequestHandler):
+    @web.asynchronous
+    @gen.coroutine
     def get(self):
         user_id = self.get_argument("user_id",default=None)
         if user_id:
             user_id = int(user_id)
-            user_list = []
-            user_res = get_data(user_id)
-            assert(user_res is not None)
-            user_list.append(user_res)
-            if user_res["attentions"]:
-                attentions = [get_data(int(x)) for x in user_res["attentions"]]
-                user_list.extend(attentions)
+            user_list = yield get_relationship_data(user_id)
             
             nodes = [{"name":user["name"], "image":user["face"]} for user in user_list if user is not None]
             edges = [{"source":0,"target":x} for x in range(1,len(nodes))]
             
             data = {"nodes":nodes,"edges":edges}       
             self.write(json.dumps(data))
+        self.finish()
         
 class SexDistributionJsonHandler(web.RequestHandler):
     def get(self):
