@@ -6,6 +6,7 @@ Created on Mon Apr  4 18:17:33 2016
 """
 import json
 import logging
+import zlib
 
 from tornado.concurrent import return_future 
 from tornado import web
@@ -13,7 +14,9 @@ from tornado import gen
 
 import requests as rq
 import pymongo
-import zlib
+
+from .comment import fetch_comment
+
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -28,6 +31,11 @@ db = conn.bilidb
 dataset = db.bilidata
 dataset.create_index("mid", unique=True)
 dataset.create_index(u"crc32_int")
+
+comments = db.comments
+comments.create_index(u"aid")
+comments.create_index(u"crc")
+
 
 def get_data(user_id = 423895):
     res = dataset.find_one({"mid":user_id})
@@ -50,6 +58,8 @@ def get_data(user_id = 423895):
         return data
     except:
         return None
+        
+
         
 @return_future        
 def get_relationship_data(user_id,callback):
@@ -89,10 +99,46 @@ class SexDistributionJsonHandler(web.RequestHandler):
         result += [(name,dataset.find({'sex':name}).count()) for name in query_strings]
         data = {"data":result}
         self.write(json.dumps(data))
+        
+        
+        
+@return_future       
+def get_comments(aid,update_flag,callback):
+    res = comments.find({"aid":aid},{"_id":0})
+    comment_list = []
+    if 0 == res.count() or 1 == update_flag:
+        try:
+            logging.debug("Fetching aid %d"%aid)
+            comment_list = fetch_comment(aid)
+            comments.insert_many(comment_list)
+            logging.debug("Fetched aid %d"%aid)
+        except:
+            logging.debug("Error when fetching aid %d"%aid)
+    else:
+        comment_list = [x for x in res]
 
+    callback(comment_list)
+            
+      
+        
+        
+        
+class CommentJsonHandler(web.RequestHandler):
+    @web.asynchronous
+    @gen.coroutine
+    def get(self):
+        aid = self.get_argument("aid",default=None)
+        update_flag = self.get_argument("update",default=0)
+        if aid:
+            aid = int(aid)
+            result = yield get_comments(aid, update_flag)
+            self.write(json.dumps(result))
+            
+        self.finish()
 
 json_handlers = [(r'/relationship_data', RelationshipJsonHandler),
-                 (r'/sex_distribution_data', SexDistributionJsonHandler)
+                 (r'/sex_distribution_data', SexDistributionJsonHandler),
+                 (r"/CommentJsonHandler",CommentJsonHandler)
                  ]
 
 

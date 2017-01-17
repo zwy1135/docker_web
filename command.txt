@@ -1,3 +1,6 @@
 docker rm -v `docker ps -aq`
 docker rmi `docker images -aq -f dangling=true`
 docker rmi -f $(docker images | grep "<none>" | awk "{print \$3}")
+
+#²úÉúrequirements.txt
+pigar
