@@ -2,9 +2,9 @@ FROM frolvlad/alpine-glibc
   
 RUN mkdir -p /web
 
-WORKDIR /web
+RUN apk add --update wget
 
-VOLUME ["/transfer"]
+WORKDIR /web
 
 ADD ./entrypoint.sh /web
 

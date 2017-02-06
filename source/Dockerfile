@@ -14,8 +14,9 @@ ADD ./ /application
 
 RUN pyinstaller -F -y ./main.py
 
+WORKDIR /application/dist
 
-RUN cp -f ./dist/main /transfer/
+EXPOSE 8080
 
-CMD ["cp","-f","./dist/main","/transfer/"]
+CMD ["python3","-m","http.server","80"]
 

@@ -13,7 +13,6 @@ def fetch_comment(aid):
     res = rq.get("http://comment.bilibili.com/%d.xml"%aid)
     if res.status_code != 200:
         print("error occuring when trying %d."%aid)
-        print(res.text)
         return []
     xmlstring = res.text
     parsed = xtd.parse(xmlstring)

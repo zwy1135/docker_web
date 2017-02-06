@@ -35,7 +35,7 @@ dataset.create_index(u"crc32_int")
 comments = db.comments
 comments.create_index(u"aid")
 comments.create_index(u"crc")
-
+comments.create_index(u"comment_id",unique=True)
 
 def get_data(user_id = 423895):
     res = dataset.find_one({"mid":user_id})
@@ -106,7 +106,7 @@ class SexDistributionJsonHandler(web.RequestHandler):
 def get_comments(aid,update_flag,callback):
     res = comments.find({"aid":aid},{"_id":0})
     comment_list = []
-    if 0 == res.count() or 1 == update_flag:
+    if 0 == res.count() or 1 == int(update_flag):
         try:
             logging.debug("Fetching aid %d"%aid)
             comment_list = fetch_comment(aid)

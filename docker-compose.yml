@@ -1,42 +1,46 @@
-﻿mongodb:
-    image: mongo:latest
-    volumes: 
-        - "/data/mongo/bili/db:/data/db"
-        - "/data/mongo/bili/configdb:/data/configdb"
-    expose: 
-        - "27017"
-    ports:
-        - "27017:27017"
+﻿version: "2"
+services:
+    mongodb:
+        image: mongo:latest
+        volumes: 
+            - "/data/mongo/bili/db:/data/db"
+            - "/data/mongo/bili/configdb:/data/configdb"
+        expose: 
+            - "27017"
+        ports:
+            - "27017:27017"
 
-buildexe: 
-    build: ./source 
-    volumes:
-        - "/tmp/transfer:/transfer"
-    
-web1:
-    build: ./web 
-    volumes_from: 
-        - buildexe 
-    expose: 
-        - "8000"
-    links:
-        - mongodb
+    buildexe: 
+        expose: 
+            - "80"
+        build: ./source 
+        
+    web1:
+        build: ./web 
+        expose: 
+            - "8000"
+        links:
+            - mongodb
+            - buildexe
+        depends_on: 
+            - buildexe
 
-web2:
-    build: ./web 
-    volumes_from: 
-        - buildexe 
-    expose: 
-        - "8000"
-    links:
-        - mongodb
+    web2:
+        build: ./web 
+        expose: 
+            - "8000"
+        links:
+            - mongodb
+            - buildexe
+        depends_on: 
+            - buildexe
 
-loadbalancer:
-    build: ./LB
-    expose:
-        - "80"
-    ports:
-        - "80:80"
-    links:
-        - web1
-        - web2
+    loadbalancer:
+        build: ./LB
+        expose:
+            - "80"
+        ports:
+            - "80:80"
+        links:
+            - web1
+            - web2

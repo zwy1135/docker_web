@@ -1,3 +1,4 @@
 #!/bin/sh
-cp -f /transfer/main /web/main
+wget "http://buildexe/main" 
+chmod a+x main
 ./main
