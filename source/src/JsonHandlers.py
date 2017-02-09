@@ -7,6 +7,7 @@ Created on Mon Apr  4 18:17:33 2016
 import json
 import logging
 import zlib
+from copy import deepcopy
 
 from tornado.concurrent import return_future 
 from tornado import web
@@ -110,7 +111,7 @@ def get_comments(aid,update_flag,callback):
         try:
             logging.debug("Fetching aid %d"%aid)
             comment_list = fetch_comment(aid)
-            comments.insert_many(comment_list)
+            comments.insert_many(deepcopy(comment_list))
             logging.debug("Fetched aid %d"%aid)
         except:
             logging.debug("Error when fetching aid %d"%aid)
