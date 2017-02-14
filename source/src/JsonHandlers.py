@@ -38,8 +38,8 @@ comments.create_index(u"aid")
 comments.create_index(u"crc")
 comments.create_index(u"comment_id",unique=True)
 
-def get_data(user_id = 423895):
-    res = dataset.find_one({"mid":user_id})
+def get_data(user_id):
+    res = dataset.find_one({"mid":user_id},{"_id":0})
     if  res is not None:
         return res
     try:
@@ -53,14 +53,15 @@ def get_data(user_id = 423895):
         crc32 = zlib.crc32(b'%d'%data["mid"])
         data[u"crc32"] = u"%x"%crc32
         data[u"crc32_int"] = crc32
+        data_for_return = deepcopy(data)
         dataset.insert_one(data)
         
         logging.debug("got user %s"%str(data["name"]))
-        return data
+        return data_for_return
     except:
         return None
         
-
+#####################################################
         
 @return_future        
 def get_relationship_data(user_id,callback):
@@ -91,7 +92,9 @@ class RelationshipJsonHandler(web.RequestHandler):
             data = {"nodes":nodes,"edges":edges}       
             self.write(json.dumps(data))
         self.finish()
-        
+
+#############################################################################
+
 class SexDistributionJsonHandler(web.RequestHandler):
     def get(self):
         query_strings = [u'男', u'女', u'保密']
@@ -100,8 +103,8 @@ class SexDistributionJsonHandler(web.RequestHandler):
         result += [(name,dataset.find({'sex':name}).count()) for name in query_strings]
         data = {"data":result}
         self.write(json.dumps(data))
-        
-        
+
+#######################################################     
         
 @return_future       
 def get_comments(aid,update_flag,callback):
@@ -120,7 +123,7 @@ def get_comments(aid,update_flag,callback):
 
     callback(comment_list)
             
-      
+#########################################   
         
         
         
@@ -136,10 +139,56 @@ class CommentJsonHandler(web.RequestHandler):
             self.write(json.dumps(result))
             
         self.finish()
+##############################
+@return_future 
+def get_single_user_info(user_id, callback):
+    callback(get_data(user_id))
+
+class UserInfoJsonHandler(web.RequestHandler):
+    @web.asynchronous
+    @gen.coroutine
+    def get(self):
+        user_id = self.get_argument("user_id",default=None)
+        update_flag = self.get_argument("update",default=0)
+        if user_id:
+            user_id = int(user_id)
+            result = yield get_single_user_info(user_id)
+            self.write(json.dumps(result))
+            
+        self.finish()
+################################
+@return_future 
+def get_comment_from_crc(crc32, callback):
+    res = comments.find({"crc":crc32},{"_id":0})
+    callback([x for x in res])
+
+class UserCommentJsonHandler(web.RequestHandler):
+    @web.asynchronous
+    @gen.coroutine
+    def get(self):
+        user_id = self.get_argument("user_id",default=None)
+        if user_id:
+            user_id = int(user_id)
+            user_info = yield get_single_user_info(user_id)
+            comments = []
+            if user_info:
+                comments = yield get_comment_from_crc(user_info["crc32_int"])
+            self.write(json.dumps(comments))
+            
+        self.finish()
+
+
+
+
+
+
+
 
 json_handlers = [(r'/relationship_data', RelationshipJsonHandler),
                  (r'/sex_distribution_data', SexDistributionJsonHandler),
-                 (r"/CommentJsonHandler",CommentJsonHandler)
+                 (r"/CommentJsonHandler",CommentJsonHandler),
+                 (r"/UserInfoJsonHandler",UserInfoJsonHandler),
+                 (r"/UserCommentJsonHandler",UserCommentJsonHandler),
                  ]
 
 
