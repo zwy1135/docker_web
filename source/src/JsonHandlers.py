@@ -38,17 +38,25 @@ comments.create_index(u"aid")
 comments.create_index(u"crc")
 comments.create_index(u"comment_id",unique=True)
 
+headers = {
+"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+"Referer": "https://space.bilibili.com",
+}
+
 def get_data(user_id):
+    user_id = int(user_id)
     res = dataset.find_one({"mid":user_id},{"_id":0})
     if  res is not None:
         return res
     try:
         logging.debug("Crawling user_id %d"%user_id)
-        response = rq.get("http://app.bilibili.com/x/v2/space?build=4040&vmid=%d"%user_id)
-        if 200 != response.status_code:
+        response = rq.post("https://space.bilibili.com/ajax/member/GetInfo",data={"mid":user_id},headers=headers)
+        result = response.json()
+        if (200 != response.status_code) or (False == result["status"]):
             return None
         
-        data = response.json()["data"]["card"]
+        data = result["data"]
         data["mid"] = int(data["mid"])
         crc32 = zlib.crc32(b'%d'%data["mid"])
         data[u"crc32"] = u"%x"%crc32
@@ -58,7 +66,9 @@ def get_data(user_id):
         
         logging.debug("got user %s"%str(data["name"]))
         return data_for_return
-    except:
+    except Exception as e:
+        logging.info(response.json())
+        logging.info(str(e))
         return None
         
 #####################################################
@@ -174,6 +184,8 @@ class UserCommentJsonHandler(web.RequestHandler):
             if user_info:
                 comments = yield get_comment_from_crc(user_info["crc32_int"])
             self.write(json.dumps(comments))
+        else:
+            self.write("")
             
         self.finish()
 
